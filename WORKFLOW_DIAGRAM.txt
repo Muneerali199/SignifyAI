@@ -1,0 +1,294 @@
+```
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                   ISL MODEL TRAINING PIPELINE WORKFLOW                       ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ PHASE 1: SETUP (One-time, ~10 minutes)                                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────────┐
+    │  Install Python │
+    │  Dependencies   │
+    └────────┬────────┘
+             │
+             ▼
+    ┌─────────────────┐
+    │  Setup Kaggle   │
+    │  API Credentials│
+    └────────┬────────┘
+             │
+             ▼
+    ┌─────────────────┐
+    │  Verify Setup   │
+    │  (kaggle list)  │
+    └─────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ PHASE 2: DATA PREPARATION (~10-15 minutes)                                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ┌──────────────────────┐
+    │ Run download_dataset │
+    │      python          │
+    └──────────┬───────────┘
+               │
+               ▼
+    ┌──────────────────────┐         ┌─────────────────────┐
+    │  Download from       │────────▶│  Extract to         │
+    │  Kaggle              │         │  data/ directory    │
+    └──────────────────────┘         └──────────┬──────────┘
+                                                 │
+                                                 ▼
+                                     ┌──────────────────────┐
+                                     │  Organize by         │
+                                     │  gesture classes     │
+                                     └──────────────────────┘
+
+    Dataset Structure:
+    data/
+    └── indian-sign-language-isl/
+        ├── Hello/
+        │   ├── img1.jpg
+        │   ├── img2.jpg
+        │   └── ...
+        ├── ThankYou/
+        ├── Sorry/
+        └── ... (more gestures)
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ PHASE 3: MODEL TRAINING (1-3 hours)                                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ┌──────────────────┐
+    │  Run train.py    │
+    └────────┬─────────┘
+             │
+             ▼
+    ┌──────────────────────────────────────────────────────────┐
+    │  Data Loading & Augmentation                             │
+    │  - Load images from data/                                │
+    │  - Apply augmentation (rotate, shift, zoom, flip)        │
+    │  - Split into train (80%) / validation (20%)             │
+    └──────────────────┬───────────────────────────────────────┘
+                       │
+                       ▼
+    ┌──────────────────────────────────────────────────────────┐
+    │  Model Architecture                                       │
+    │  ┌─────────────────────────────────────────────────────┐ │
+    │  │ Input (224x224x3)                                   │ │
+    │  │   ↓                                                 │ │
+    │  │ Conv2D(32) + BatchNorm + MaxPool + Dropout(0.25)   │ │
+    │  │   ↓                                                 │ │
+    │  │ Conv2D(64) + BatchNorm + MaxPool + Dropout(0.25)   │ │
+    │  │   ↓                                                 │ │
+    │  │ Conv2D(128) + BatchNorm + MaxPool + Dropout(0.25)  │ │
+    │  │   ↓                                                 │ │
+    │  │ Conv2D(256) + BatchNorm + MaxPool + Dropout(0.25)  │ │
+    │  │   ↓                                                 │ │
+    │  │ Flatten                                             │ │
+    │  │   ↓                                                 │ │
+    │  │ Dense(512) + BatchNorm + Dropout(0.5)              │ │
+    │  │   ↓                                                 │ │
+    │  │ Dense(256) + BatchNorm + Dropout(0.5)              │ │
+    │  │   ↓                                                 │ │
+    │  │ Dense(num_classes, softmax)                        │ │
+    │  └─────────────────────────────────────────────────────┘ │
+    └──────────────────┬───────────────────────────────────────┘
+                       │
+                       ▼
+    ┌──────────────────────────────────────────────────────────┐
+    │  Training Loop (up to 50 epochs)                         │
+    │  - Optimizer: Adam (lr=0.001)                            │
+    │  - Loss: Categorical Crossentropy                        │
+    │  - Metrics: Accuracy, Top-3 Accuracy                     │
+    │  - Callbacks:                                            │
+    │    • ModelCheckpoint (save best)                         │
+    │    • EarlyStopping (patience=10)                         │
+    │    • ReduceLROnPlateau (patience=5)                      │
+    │    • TensorBoard (logging)                               │
+    └──────────────────┬───────────────────────────────────────┘
+                       │
+                       ▼
+    ┌──────────────────────────────────────────────────────────┐
+    │  Output Files (model/ directory)                         │
+    │  ✓ isl_model.h5 (final model)                           │
+    │  ✓ isl_model_best.h5 (best checkpoint)                  │
+    │  ✓ labels.json (class mappings)                         │
+    │  ✓ training_history.json (metrics)                      │
+    │  ✓ model_config.json (metadata)                         │
+    └──────────────────────────────────────────────────────────┘
+
+    Optional: Monitor Training
+    ┌──────────────────┐
+    │  tensorboard     │
+    │  --logdir logs   │
+    └──────────────────┘
+           │
+           ▼
+    http://localhost:6006
+    (View accuracy, loss, etc.)
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ PHASE 4: MODEL CONVERSION (~2 minutes)                                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────────────────┐
+    │  Run convert_to_tflite  │
+    │       python            │
+    └───────────┬─────────────┘
+                │
+                ▼
+    ┌──────────────────────────────────┐
+    │  Load isl_model.h5               │
+    └───────────┬──────────────────────┘
+                │
+                ├─────────────┬──────────────┐
+                ▼             ▼              ▼
+    ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+    │  Standard    │  │  Quantized   │  │  Metadata    │
+    │  TFLite      │  │  TFLite      │  │  JSON        │
+    │  (~100 MB)   │  │  (~50 MB)    │  │              │
+    └──────────────┘  └──────────────┘  └──────────────┘
+         │                  │                  │
+         ▼                  ▼                  ▼
+    isl_model.tflite  isl_model_quantized  tflite_metadata.json
+                           .tflite
+                      (Use this for mobile!)
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ PHASE 5: TESTING & VALIDATION (~2 minutes)                                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────────────┐
+    │  Run test_model.py  │
+    │    compare          │
+    └──────────┬──────────┘
+               │
+               ├───────────────┬───────────────┐
+               ▼               ▼               ▼
+    ┌─────────────────┐  ┌─────────────┐  ┌─────────────┐
+    │  Load random    │  │  Test with  │  │  Compare    │
+    │  test images    │─▶│  Keras      │─▶│  predictions│
+    └─────────────────┘  └─────────────┘  └──────┬──────┘
+                                                  │
+                                                  ▼
+                         ┌─────────────┐  ┌─────────────┐
+                         │  Test with  │─▶│  Display    │
+                         │  TFLite     │  │  results    │
+                         └─────────────┘  └─────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ PHASE 6: DEPLOYMENT (~1 minute)                                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ┌───────────────────────────────────┐
+    │  Copy to Mobile App               │
+    │  model/ → app/assets/models/      │
+    └───────────────┬───────────────────┘
+                    │
+                    ▼
+    ┌───────────────────────────────────┐
+    │  Files Copied:                    │
+    │  ✓ isl_model_quantized.tflite    │
+    │  ✓ labels.json                    │
+    └───────────────┬───────────────────┘
+                    │
+                    ▼
+    ┌───────────────────────────────────┐
+    │  Update gestureRecognition.ts     │
+    │  to load real TFLite model        │
+    └───────────────┬───────────────────┘
+                    │
+                    ▼
+    ┌───────────────────────────────────┐
+    │  Test in Mobile App               │
+    │  npm run dev                      │
+    └───────────────────────────────────┘
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                            FILE FLOW SUMMARY                                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Kaggle Dataset                 Training                    Mobile App
+─────────────────             ──────────                  ──────────────
+
+  ┌─────────┐                                              
+  │ Images  │──download────▶ data/                         
+  │ (ISL)   │                 │                            
+  └─────────┘                 │                            
+                              ▼                            
+                          train.py                         
+                              │                            
+                              ▼                            
+                          model/                           
+                          ├─ .h5 files                     
+                          ├─ .json files                   
+                          └─ training_history              
+                              │                            
+                              ▼                            
+                      convert_to_tflite.py                 
+                              │                            
+                              ▼                            
+                          ├─ .tflite ──────────────────▶ app/assets/models/
+                          └─ labels.json ──────────────▶ app/assets/models/
+                                                            │
+                                                            ▼
+                                                    gestureRecognition.ts
+                                                            │
+                                                            ▼
+                                                    Mobile App (React Native)
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                          COMMAND CHEAT SHEET                                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+# Setup (once)
+pip install -r training/requirements.txt
+# Setup kaggle.json in ~/.kaggle/ or %USERPROFILE%\.kaggle\
+
+# Download data
+cd training
+python download_dataset.py
+
+# Train model
+python train.py
+
+# Monitor training (optional, separate terminal)
+tensorboard --logdir logs
+
+# Convert to mobile format
+python convert_to_tflite.py
+
+# Test models
+python test_model.py compare
+
+# Deploy to app
+cd ..
+Copy-Item model\isl_model_quantized.tflite app\assets\models\
+Copy-Item model\labels.json app\assets\models\
+
+# Run mobile app
+npm run dev
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                          TIME ESTIMATES                                      ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Phase 1: Setup                   ~10 minutes (one-time)
+Phase 2: Data Preparation        ~10-15 minutes
+Phase 3: Training                ~1-3 hours (GPU) / ~8-24 hours (CPU)
+Phase 4: Conversion              ~2 minutes
+Phase 5: Testing                 ~2 minutes
+Phase 6: Deployment              ~1 minute
+─────────────────────────────────────────────────────────
+Total (after setup):             ~1-3 hours + 30 minutes
+```

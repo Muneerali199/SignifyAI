@@ -1,0 +1,162 @@
+<!-- SignSpeak Splash Screen - 1284x2778 (iPhone 11 Pro Max) -->
+<svg width="1284" height="2778" viewBox="0 0 1284 2778" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Gradient -->
+  <defs>
+    <linearGradient id="splashBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#6366F1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="whiteGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E0E7FF;stop-opacity:0.9" />
+    </linearGradient>
+    
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="10" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="softShadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1284" height="2778" fill="url(#splashBg)"/>
+  
+  <!-- Decorative Elements -->
+  <!-- Top Right Circle -->
+  <circle cx="1100" cy="300" r="200" fill="#10B981" opacity="0.15"/>
+  <circle cx="1050" cy="350" r="120" fill="#FFFFFF" opacity="0.1"/>
+  
+  <!-- Top Left Circle -->
+  <circle cx="200" cy="400" r="150" fill="#FFFFFF" opacity="0.08"/>
+  
+  <!-- Bottom Left Circle -->
+  <circle cx="150" cy="2400" r="180" fill="#10B981" opacity="0.12"/>
+  
+  <!-- Bottom Right Circle -->
+  <circle cx="1000" cy="2500" r="140" fill="#FFFFFF" opacity="0.1"/>
+  
+  <!-- Floating Sparkles -->
+  <g opacity="0.6">
+    <circle cx="300" cy="800" r="6" fill="#FCD34D"/>
+    <circle cx="950" cy="1000" r="8" fill="#10B981"/>
+    <circle cx="450" cy="1200" r="5" fill="#FFFFFF"/>
+    <circle cx="850" cy="1600" r="7" fill="#FCD34D"/>
+    <circle cx="200" cy="1800" r="6" fill="#FFFFFF"/>
+    <circle cx="1050" cy="1900" r="8" fill="#10B981"/>
+  </g>
+  
+  <!-- Main Content Container -->
+  <g transform="translate(642, 1100)">
+    <!-- Large Hand Sign Icon -->
+    <g transform="translate(0, -200)" filter="url(#softShadow)">
+      <!-- Palm -->
+      <ellipse cx="0" cy="80" rx="120" ry="140" fill="url(#whiteGlow)"/>
+      
+      <!-- Wrist -->
+      <rect x="-70" y="200" width="140" height="80" rx="20" fill="url(#whiteGlow)"/>
+      
+      <!-- Index Finger -->
+      <ellipse cx="-55" cy="-40" rx="35" ry="160" fill="url(#whiteGlow)" transform="rotate(-15 -55 -40)"/>
+      
+      <!-- Middle Finger -->
+      <ellipse cx="55" cy="-50" rx="35" ry="170" fill="url(#whiteGlow)" transform="rotate(15 55 -50)"/>
+      
+      <!-- Thumb -->
+      <ellipse cx="-120" cy="50" rx="30" ry="110" fill="url(#whiteGlow)" transform="rotate(-45 -120 50)"/>
+      
+      <!-- Folded Fingers -->
+      <ellipse cx="30" cy="120" rx="55" ry="35" fill="#6366F1" opacity="0.3"/>
+    </g>
+    
+    <!-- Speech Bubble -->
+    <g transform="translate(200, 100)">
+      <rect x="0" y="0" width="280" height="180" rx="35" fill="#10B981" opacity="0.95" filter="url(#softShadow)"/>
+      <polygon points="30,180 80,230 80,180" fill="#10B981" opacity="0.95"/>
+      
+      <!-- Sound Waves -->
+      <g stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" fill="none" opacity="0.9">
+        <path d="M 60 50 Q 80 50 80 90 Q 80 130 60 130"/>
+        <path d="M 90 35 Q 115 35 115 90 Q 115 145 90 145"/>
+        <path d="M 120 20 Q 150 20 150 90 Q 150 160 120 160"/>
+      </g>
+      
+      <!-- AI Sparkle -->
+      <g transform="translate(220, 70)" filter="url(#glow)">
+        <path d="M 0,-30 L 4,-8 L 30,0 L 4,8 L 0,30 L -4,8 L -30,0 L -4,-8 Z" fill="#FCD34D"/>
+        <circle cx="0" cy="0" r="10" fill="#FFFFFF"/>
+      </g>
+    </g>
+  </g>
+  
+  <!-- App Title -->
+  <g transform="translate(642, 1800)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="120" font-weight="800" fill="#FFFFFF" text-anchor="middle" letter-spacing="-2">
+      SignSpeak
+    </text>
+    
+    <!-- Subtitle -->
+    <text x="0" y="80" font-family="Arial, sans-serif" font-size="42" font-weight="400" fill="#E0E7FF" text-anchor="middle">
+      AI-Powered ISL Translator
+    </text>
+    
+    <!-- Tagline -->
+    <g transform="translate(0, 160)">
+      <rect x="-200" y="-30" width="400" height="60" rx="30" fill="#10B981" opacity="0.9"/>
+      <text x="0" y="10" font-family="Arial, sans-serif" font-size="32" font-weight="600" fill="#FFFFFF" text-anchor="middle">
+        Bridge the Gap
+      </text>
+    </g>
+  </g>
+  
+  <!-- Bottom Features -->
+  <g transform="translate(642, 2300)">
+    <!-- Feature Pills -->
+    <g transform="translate(-220, 0)">
+      <rect x="-80" y="-20" width="160" height="40" rx="20" fill="#FFFFFF" opacity="0.2"/>
+      <text x="0" y="8" font-family="Arial, sans-serif" font-size="22" font-weight="600" fill="#FFFFFF" text-anchor="middle">
+        99% Accurate
+      </text>
+    </g>
+    
+    <g transform="translate(0, 0)">
+      <rect x="-75" y="-20" width="150" height="40" rx="20" fill="#FFFFFF" opacity="0.2"/>
+      <text x="0" y="8" font-family="Arial, sans-serif" font-size="22" font-weight="600" fill="#FFFFFF" text-anchor="middle">
+        Real-Time
+      </text>
+    </g>
+    
+    <g transform="translate(220, 0)">
+      <rect x="-70" y="-20" width="140" height="40" rx="20" fill="#FFFFFF" opacity="0.2"/>
+      <text x="0" y="8" font-family="Arial, sans-serif" font-size="22" font-weight="600" fill="#FFFFFF" text-anchor="middle">
+        Free
+      </text>
+    </g>
+  </g>
+  
+  <!-- Loading Indicator -->
+  <g transform="translate(642, 2550)">
+    <!-- Dots -->
+    <circle cx="-40" cy="0" r="10" fill="#FFFFFF" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="0" cy="0" r="10" fill="#FFFFFF" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" begin="0.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="40" cy="0" r="10" fill="#FFFFFF" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" begin="0.4s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- Copyright -->
+  <text x="642" y="2680" font-family="Arial, sans-serif" font-size="20" font-weight="400" fill="#E0E7FF" text-anchor="middle" opacity="0.7">
+    © 2025 SignSpeak • Made with ❤️ for ISL Community
+  </text>
+</svg>

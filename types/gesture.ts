@@ -2,7 +2,7 @@ export interface Gesture {
   id: string;
   name: string;
   description: string;
-  category: 'alphabet' | 'word' | 'phrase';
+  category: 'alphabet' | 'word' | 'phrase' | 'number' | 'letter';
   videoUrl?: string;
   createdAt: Date;
 }

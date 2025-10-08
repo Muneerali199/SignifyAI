@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { Camera, CircleStop as StopCircle, RotateCw } from 'lucide-react-native';
-import { gestureRecognitionService } from '@/services/gestureRecognition';
+import { lightweightGestureRecognition } from '@/services/gestureRecognitionLightweight';
 import { useApp } from '@/contexts/AppContext';
 import { TranslationResult } from '@/types/gesture';
 
@@ -53,38 +53,65 @@ export const TranslatorCamera = ({ onGestureDetected }: TranslatorCameraProps) =
 
   const startRecording = () => {
     setIsRecording(true);
-    gestureRecognitionService.clearBuffer();
+    let frameCount = 0;
 
+    // Simulate frame capture and prediction
     intervalRef.current = setInterval(async () => {
-      const mockLandmarks = {
-        face: Array(468).fill([Math.random(), Math.random(), Math.random()]),
-        pose: Array(33).fill([Math.random(), Math.random(), Math.random()]),
-        leftHand: Array(21).fill([Math.random(), Math.random(), Math.random()]),
-        rightHand: Array(21).fill([Math.random(), Math.random(), Math.random()]),
-      };
+      frameCount++;
+      
+      // Update buffer status (simulate frame collection)
+      const percentage = Math.min((frameCount / 30) * 100, 100);
+      setBufferStatus({
+        current: frameCount,
+        required: 30,
+        percentage: percentage
+      });
 
-      gestureRecognitionService.addFrame(mockLandmarks);
+      // Every 30 frames (~3 seconds at 10fps), make a prediction
+      if (frameCount >= 30 && lightweightGestureRecognition.isReady()) {
+        try {
+          console.log('📸 Making prediction after 30 frames...');
+          
+          // In a real implementation, we'd capture actual camera frame here
+          const mockImageUri = 'mock://camera/frame.jpg';
+          
+          const prediction = await lightweightGestureRecognition.predictGesture(mockImageUri);
+          console.log('🎯 Prediction result:', prediction);
 
-      const status = gestureRecognitionService.getBufferStatus();
-      setBufferStatus(status);
+          if (prediction && prediction.confidence >= settings.confidenceThreshold) {
+            // Find matching gesture from our gestures list
+            const matchedGesture = gestures.find(g => 
+              g.name === prediction.gesture || 
+              g.name.includes(prediction.gesture)
+            );
 
-      if (gestureRecognitionService.isReadyForPrediction()) {
-        const prediction = await gestureRecognitionService.predictGesture();
+            console.log('✅ Matched gesture:', matchedGesture);
 
-        if (prediction && prediction.confidence >= settings.confidenceThreshold) {
-          const gesture = gestures[prediction.gestureIndex];
-          if (gesture) {
-            const result: TranslationResult = {
-              id: `result_${Date.now()}`,
-              gesture,
-              confidenceScore: prediction.confidence,
-              timestamp: new Date(),
-              sessionId,
-            };
+            if (matchedGesture) {
+              const result: TranslationResult = {
+                id: `result_${Date.now()}`,
+                gesture: matchedGesture,
+                confidenceScore: prediction.confidence,
+                timestamp: new Date(),
+                sessionId,
+              };
 
-            onGestureDetected(result);
-            gestureRecognitionService.clearBuffer();
+              onGestureDetected(result);
+              
+              // Reset frame count
+              frameCount = 0;
+              setBufferStatus({ current: 0, required: 30, percentage: 0 });
+            }
+          } else {
+            console.log('⚠️ Confidence too low:', prediction?.confidence, 'threshold:', settings.confidenceThreshold);
+            // Reset anyway to try again
+            frameCount = 0;
+            setBufferStatus({ current: 0, required: 30, percentage: 0 });
           }
+        } catch (error) {
+          console.error('❌ Prediction error:', error);
+          frameCount = 0;
+          setBufferStatus({ current: 0, required: 30, percentage: 0 });
         }
       }
     }, 100);
@@ -96,7 +123,6 @@ export const TranslatorCamera = ({ onGestureDetected }: TranslatorCameraProps) =
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    gestureRecognitionService.clearBuffer();
     setBufferStatus({ current: 0, required: 30, percentage: 0 });
   };
 

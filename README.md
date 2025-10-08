@@ -71,14 +71,29 @@ The app recognizes 22 common ISL gestures including:
 
 ### Prerequisites
 
+**For Mobile App:**
 - Node.js 18+
 - Expo CLI
 - iOS Simulator or Android Emulator (or physical device)
 
+**For Model Training:**
+- Python 3.8+
+- TensorFlow 2.13+
+- Kaggle API credentials
+- GPU recommended (but not required)
+
 ### Installation
+
+**Mobile App Setup:**
 
 ```bash
 npm install
+```
+
+**Training Environment Setup:**
+
+```bash
+pip install -r training/requirements.txt
 ```
 
 ### Running the App
@@ -103,6 +118,100 @@ npm run build:web
 ```bash
 npm run typecheck
 ```
+
+## 🎓 Model Training
+
+### Complete Training Pipeline
+
+Follow these steps to train your own ISL recognition model:
+
+#### 1. Setup Kaggle API
+
+```powershell
+# Install Kaggle CLI
+pip install kaggle
+
+# Setup credentials (see training/KAGGLE_SETUP.md for details)
+New-Item -Path "$env:USERPROFILE\.kaggle" -ItemType Directory -Force
+# Place your kaggle.json in C:\Users\<YourUsername>\.kaggle\
+```
+
+#### 2. Download Dataset
+
+```powershell
+python training/download_dataset.py
+```
+
+Choose from:
+- Indian Sign Language ISL Dataset (image-based)
+- ISL CSLTR Dataset (video-based)
+- Both datasets
+
+#### 3. Train the Model
+
+```powershell
+python training/train.py
+```
+
+Features:
+- CNN with BatchNormalization and Dropout
+- Data augmentation (rotation, shifts, zoom, flips)
+- Early stopping and learning rate reduction
+- TensorBoard logging
+- Saves best model automatically
+
+#### 4. Monitor Training (Optional)
+
+```powershell
+tensorboard --logdir training/logs
+```
+
+Open http://localhost:6006 to view metrics.
+
+#### 5. Convert to TFLite
+
+```powershell
+python training/convert_to_tflite.py
+```
+
+Creates:
+- Standard TFLite model
+- Quantized TFLite model (smaller, faster)
+- Model metadata
+
+#### 6. Test the Model
+
+```powershell
+# Test Keras model
+python training/test_model.py keras
+
+# Test TFLite model  
+python training/test_model.py tflite
+
+# Compare both
+python training/test_model.py compare
+```
+
+### Training Configuration
+
+Default settings in `training/train.py`:
+- **Image Size**: 224x224
+- **Batch Size**: 32
+- **Epochs**: 50 (with early stopping)
+- **Learning Rate**: 0.001
+- **Validation Split**: 20%
+
+### Deployment
+
+After training:
+
+```powershell
+# Copy model to app assets
+Copy-Item model/isl_model_quantized.tflite app/assets/models/
+Copy-Item model/labels.json app/assets/models/
+```
+
+For complete training documentation, see [`training/README.md`](training/README.md)
 
 ## Integration Guide
 
